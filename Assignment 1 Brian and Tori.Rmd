@@ -6,6 +6,7 @@ output:
   html_document: default
   pdf_document: default
 ---
+
 ```{r}
 library(tidyverse)
 df <- read_csv("Projects - January 22, 2022.csv")
@@ -35,15 +36,15 @@ Getting the first graph together
 ```{r All}
 data <- tab_All
 data$Phase <- factor(data$Phase, levels = c('PLANNING',
-                                          'PREDESIGN',
-                                          'DESIGN',
-                                          'IMPLEMENT',
-                                          'CLOSEOUT',
-                                          'HOLD',
-                                          'NOT SET'))
+                                            'PREDESIGN',
+                                            'DESIGN',
+                                            'IMPLEMENT',
+                                            'CLOSEOUT',
+                                            'HOLD',
+                                            'NOT SET'))
 base <- ggplot(data, aes(x = Phase,
-                   y = Count,
-                   label = Count)) +
+                         y = Count,
+                         label = Count)) +
   theme_classic()
 
 lolliplot_All = base + 
@@ -161,5 +162,6 @@ ggarrange(lolliplot_M_Yes, lolliplot_M_No, lolliplot_All,
           ncol = 2, nrow = 2)
 ```
 
+# Note to Professor Jose Manuel
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+We will pick from one of the above plots based on the best use for our client. All projects, master projects or sub projects. We may do some combination of the three
