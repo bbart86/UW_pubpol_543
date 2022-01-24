@@ -1,0 +1,165 @@
+---
+title: "Project Phase Plots"
+author: "Brian"
+date: "1/23/2022"
+output:
+  html_document: default
+  pdf_document: default
+---
+```{r}
+library(tidyverse)
+df <- read_csv("Projects - January 22, 2022.csv")
+```
+
+```{r}
+#tidyverse glimpse
+glimpse(df, width = 100)
+```
+
+getting the data together
+
+```{r}
+df2 <- df %>% select(Phase, Master)
+
+tab_All <- df2 %>% select(-Master) %>% table() %>% as_tibble() %>% rename(Phase = ".", Count = n)
+tab_M_Yes <- df2 %>% filter(Master == "Yes") %>% table() %>% as_tibble() %>% rename(Count = n)
+tab_M_No <- df2 %>% filter(Master == "No") %>% table() %>% as_tibble() %>% rename(Count = n)
+
+title_Text <- 'Total number of projects by phase'
+X_axis_title <- 'Project Phases'
+max <- as.integer(max(tab_All$Count)) 
+```
+
+Getting the first graph together
+
+```{r All}
+data <- tab_All
+data$Phase <- factor(data$Phase, levels = c('PLANNING',
+                                          'PREDESIGN',
+                                          'DESIGN',
+                                          'IMPLEMENT',
+                                          'CLOSEOUT',
+                                          'HOLD',
+                                          'NOT SET'))
+base <- ggplot(data, aes(x = Phase,
+                   y = Count,
+                   label = Count)) +
+  theme_classic()
+
+lolliplot_All = base + 
+  geom_segment(aes(y = 0, 
+                   yend = Count, 
+                   x = Phase, 
+                   xend = Phase),
+               color = "gray")  +
+  
+ geom_point(size = 4, color = "Blue") +
+  geom_text(nudge_x=0.3,show.legend = FALSE) +
+  geom_hline(yintercept = 0) +
+  scale_y_continuous(limits = c(0, max)) + 
+  theme(axis.ticks.y = element_blank(),
+        axis.title.y = element_blank(),
+        axis.line.y = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks.x = element_blank(),
+        axis.title.x = element_blank(),
+        axis.line.x = element_blank()) +
+  labs(title = title_Text) +
+  xlab(X_axis_title)
+```
+
+Replicating the data with each graphs
+
+```{r Master}
+data <- tab_M_Yes
+data$Phase <- factor(data$Phase, levels = c('PLANNING',
+                                          'PREDESIGN',
+                                          'DESIGN',
+                                          'IMPLEMENT',
+                                          'CLOSEOUT',
+                                          'HOLD',
+                                          'NOT SET'))
+base <- ggplot(data, aes(x = Phase,
+                   y = Count,
+                   label = Count)) +
+  theme_classic()
+
+lolliplot_M_Yes = base + 
+  geom_segment(aes(y = 0, 
+                   yend = Count, 
+                   x = Phase, 
+                   xend = Phase),
+               color = "gray")  +
+  
+ geom_point(size = 4, color = "Blue") +
+  geom_text(nudge_x=0.3,show.legend = FALSE) +
+  geom_hline(yintercept = 0) +
+  scale_y_continuous(limits = c(0, max)) + 
+  theme(axis.ticks.y = element_blank(),
+        axis.title.y = element_blank(),
+        axis.line.y = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks.x = element_blank(),
+        axis.title.x = element_blank(),
+        axis.line.x = element_blank()) +
+  labs(title = title_Text) +
+  xlab(X_axis_title)
+```
+
+Second Graph
+
+```{r master}
+data <- tab_M_No
+data$Phase <- factor(data$Phase, levels = c('PLANNING',
+                                          'PREDESIGN',
+                                          'DESIGN',
+                                          'IMPLEMENT',
+                                          'CLOSEOUT',
+                                          'HOLD',
+                                          'NOT SET'))
+base <- ggplot(data, aes(x = Phase,
+                   y = Count,
+                   label = Count)) +
+  theme_classic()
+
+lolliplot_M_No = base + 
+  geom_segment(aes(y = 0, 
+                   yend = Count, 
+                   x = Phase, 
+                   xend = Phase),
+               color = "gray")  +
+  
+ geom_point(size = 4, color = "Blue") +
+  geom_text(nudge_x=0.3,show.legend = FALSE) +
+  geom_hline(yintercept = 0) +
+  scale_y_continuous(limits = c(0, max)) + 
+  theme(axis.ticks.y = element_blank(),
+        axis.title.y = element_blank(),
+        axis.line.y = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks.x = element_blank(),
+        axis.title.x = element_blank(),
+        axis.line.x = element_blank()) +
+  labs(title = title_Text) +
+  xlab(X_axis_title)
+```
+
+```{r}
+## All Airport Projects
+lolliplot_All
+## All Master Projects
+lolliplot_M_Yes
+## All Non-Master Projects
+lolliplot_M_No
+```
+
+My attempt at a faccet wrap. I can go back and dropt the titles, then do colors = Phase and have the legend in the bottom right
+
+```{r}
+library(ggpubr)
+ggarrange(lolliplot_M_Yes, lolliplot_M_No, lolliplot_All,
+          ncol = 2, nrow = 2)
+```
+
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
