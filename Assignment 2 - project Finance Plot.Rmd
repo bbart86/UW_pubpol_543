@@ -1,0 +1,109 @@
+---
+title: "Project Phase Plots"
+author: "Brian"
+date: "1/23/2022"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+```{r}
+library(tidyverse)
+df <- read_csv("Projects - January 22, 2022.csv")
+```
+
+```{r}
+#tidyverse glimpse
+glimpse(df, width = 75)
+```
+
+getting the data together
+
+```{r}
+df3 <- df %>% select(Name, Program, `LTD Actuals`, `EAC (Current)`) %>% drop_na() %>%
+  mutate(budget_remaining = (`EAC (Current)` - `LTD Actuals`),
+         p_budget_remaining = (budget_remaining / `EAC (Current)`))
+         
+df3 <- df3 %>% mutate(p_budget_remaining = round(df3$p_budget_remaining, 2))
+
+tab_fin <- df3 %>% select(-c( `LTD Actuals`, `EAC (Current)`)) %>%  as_tibble()
+
+
+title_Text <- 'Budget Remaining by Project'
+X_axis_title <- 'Project Names'
+max <- as.integer(max(tab_fin$p_budget_remaining)) 
+min <- as.integer(min(tab_fin$budget_remaining))
+```
+
+Getting the first graph together
+
+```{r base}
+data <- tab_fin
+
+base <- ggplot(data, aes(x = Name,
+                         y = p_budget_remaining,
+                         label = Name)) +
+  theme_classic()
+```
+
+```{r first graph}
+lolliplot_All = base + 
+  geom_segment(aes(y = 0, 
+                   yend = p_budget_remaining, 
+                   x = Name, 
+                   xend = Name),
+               color = "gray")  +
+  
+ geom_point(size = 4, color = "Blue") +
+  geom_text(nudge_x=0.3,show.legend = FALSE) +
+  geom_hline(yintercept = 0) +
+  #scale_y_continuous(limits = c(min, max)) + 
+  theme(axis.ticks.y = element_blank(),
+        axis.title.y = element_blank(),
+        axis.line.y = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks.x = element_blank(),
+        axis.title.x = element_blank(),
+        axis.line.x = element_blank()) +
+  labs(title = title_Text) +
+  xlab(X_axis_title)
+lolliplot_All
+```
+
+Cleaning the graph
+
+```{r Master}
+data <- tab_fin  %>% filter(p_budget_remaining <= .9) %>% 
+  mutate(surplus = p_budget_remaining > 0)
+
+base <- ggplot(data, aes(x = reorder(Name, p_budget_remaining),
+                         y = p_budget_remaining,
+                         label = scales::percent(p_budget_remaining),
+                         color = surplus)) +
+  theme_classic()
+
+
+lolliplot_90 = base + 
+  geom_segment(aes(y = 0, 
+                   yend = p_budget_remaining, 
+                   x = reorder(Name, p_budget_remaining), 
+                   xend = Name),
+               color = "gray")  +
+ geom_point(size = 4, color = 'Blue') +
+  geom_text(nudge_x=2.5,show.legend = FALSE) +
+  scale_y_continuous(labels = scales::label_percent(accuracy = 1L)) +
+  geom_hline(yintercept = 0) +
+  theme(axis.ticks.y = element_blank(),
+        axis.title.y = element_blank(),
+        axis.line.y = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks.x = element_blank(),
+        axis.title.x = element_blank(),
+        axis.line.x = element_blank(),
+        axis.text.x = element_blank()) +
+  labs(title = title_Text) +
+  xlab(X_axis_title) +
+    facet_wrap(~Program)
+  
+lolliplot_90
+```
